@@ -21,3 +21,8 @@ import quantstats as qs  # Pour les analyses de performance et de risque des sé
 print("Tickers français par défaut: 'AIR', 'OR', 'AI', 'BNP', 'MC', 'SU', 'SAN', 'KER'")
 user_input = input("Appuyez sur Entrée pour utiliser les valeurs par défaut ou entrez vos propres tickers que vous voulez optimiser: séparé d'une virgule ")
 
+# Utiliser les valeurs par défaut si l'utilisateur appuie simplement sur Entrée
+tickers = user_input.strip() if user_input.strip() != "" else "AIR, SU, SAN, EL, TTE, DG, BN"
+print("Tickers sélectionnés:", tickers)
+
+
