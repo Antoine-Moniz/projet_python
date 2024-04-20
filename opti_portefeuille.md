@@ -25,4 +25,7 @@ user_input = input("Appuyez sur Entrée pour utiliser les valeurs par défaut ou
 tickers = user_input.strip() if user_input.strip() != "" else "AIR, SU, SAN, EL, TTE, DG, BN"
 print("Tickers sélectionnés:", tickers)
 
+# Demandez à l'utilisateur de saisir une date de début, avec une date par défaut.
+date_debut = input("Entrez la date de début (format YYYY-MM-DD, par défaut 2014-01-01) Appuyez sur Entrée pour utiliser les valeurs par défaut : ") or "2014-01-01"
+
 
