@@ -51,3 +51,12 @@ def sharpe(rendements,rendement_taux_sans_risque):
     rendement_annuel = np.prod(rendements+1)**(252/len(rendements))-1
     return ( rendement_annuel - rendement_taux_sans_risque )/ écart_type  # Calculer du ratio de Sharpe.
 
+
+def calmar(rendements,rendement_taux_sans_risque):
+    val_portefeuille=np.cumprod(rendements+1) #Calcule la valeur cumulée du portefeuille en supposant que tous les rendements sont réinvestis.
+    peak=val_portefeuille.expanding(1).max()  #Détermine la valeur maximale du portefeuille jusqu'à chaque point dans le temps, ce qui aide à identifier les pics avant les drawdowns.
+    rendement_annuel = np.prod(rendements+1)**(252/len(rendements))-1
+    drawdown=(val_portefeuille-peak)/peak   #Calcule le drawdown comme la baisse relative depuis le dernier pic.
+    return ( rendement_annuel - rendement_taux_sans_risque )/-np.min(drawdown)
+
+
