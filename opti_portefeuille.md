@@ -46,3 +46,8 @@ def sortino(rendements,rendement_taux_sans_risque):
     rendement_annuel = np.product(rendements+1)**(252/len(rendements))-1
     return ( rendement_annuel - rendement_taux_sans_risque )/ écart_type  # Calculer du ratio de Sortino.
 
+def sharpe(rendements,rendement_taux_sans_risque):
+    écart_type=rendements.std()*np.sqrt(252)  # Calculer l'écart-type des rendements, ce qui représente la volatilité du risque
+    rendement_annuel = np.prod(rendements+1)**(252/len(rendements))-1
+    return ( rendement_annuel - rendement_taux_sans_risque )/ écart_type  # Calculer du ratio de Sharpe.
+
