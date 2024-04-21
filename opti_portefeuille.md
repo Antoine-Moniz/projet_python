@@ -29,3 +29,7 @@ print("Tickers sélectionnés:", tickers)
 date_debut = input("Entrez la date de début (format YYYY-MM-DD, par défaut 2014-01-01) Appuyez sur Entrée pour utiliser les valeurs par défaut : ") or "2014-01-01"
 
 
+prix = yf.download(tickers,start=date_debut)['Adj Close']  
+
+rendements = prix.pct_change().dropna(axis=1,how='all').iloc[1:].dropna(axis=1) #calculs des rendements et supressions des lignes vides apres calculs
+
