@@ -35,14 +35,14 @@ rendements = prix.pct_change().dropna(axis=1,how='all').iloc[1:].dropna(axis=1) 
 
 def sortino(rendements,rendement_taux_sans_risque):
     # Filtrer les rendements négatifs pour se concentrer uniquement sur le risque à la baisse. 
-    #rendements[rendements<0]` crée un sous-ensemble du DataFrame qui ne contient que les valeurs négatives (les rendements à la baisse).
+    #rendements[rendements<0] crée un sous-ensemble du DataFrame qui ne contient que les valeurs négatives (les rendements à la baisse).
     val_négative=rendements[rendements<0]
     # Calculer l'écart-type des rendements négatifs, ce qui représente la volatilité du risque à la baisse.
     # Cet écart-type est annualisé en le multipliant par la racine carrée de 252, le nombre typique de jours de cotation dans une année.
     écart_type = val_négative.std() * np.sqrt(252)
     # Calculer le rendement annuel moyen composé des investissements.
-    # `np.prod(rendements+1)` calcule le produit cumulatif des rendements (ajustés de 1 pour chaque période),ce qui donne la croissance totale du portefeuille sur la période.
-    # Élever ce produit à la puissance de `252/len(rendements)` annualise ce rendement, Soustraire 1 pour convertir ce facteur de croissance en rendement net.
+    # np.prod(rendements+1) calcule le produit cumulatif des rendements (ajustés de 1 pour chaque période),ce qui donne la croissance totale du portefeuille sur la période.
+    # Élever ce produit à la puissance de 252/len(rendements) annualise ce rendement, Soustraire 1 pour convertir ce facteur de croissance en rendement net.
     rendement_annuel = np.product(rendements+1)**(252/len(rendements))-1
     return ( rendement_annuel - rendement_taux_sans_risque )/ écart_type  # Calculer du ratio de Sortino.
 
