@@ -59,4 +59,14 @@ def calmar(rendements,rendement_taux_sans_risque):
     drawdown=(val_portefeuille-peak)/peak   #Calcule le drawdown comme la baisse relative depuis le dernier pic.
     return ( rendement_annuel - rendement_taux_sans_risque )/-np.min(drawdown)
 
+def scipy_func(x,arguments):   # technique d'optimisation la plus rapide mais la moin fiable  =Poids_dans_le_portfeuille
+    Poids=x.reshape(-1,1)     # Reformate le vecteur des poids x en une matrice colonne pour faciliter les opérations matricielles.
+    ratio, rendement_taux_sans_risque, rendements = arguments   #ration -> les fonctions , rendement_taux_sans_risque -> rentabilité sans risques, rendements   -> retunrs= rentabilité de chaque actif
+    val_portefeuille_rendements=pd.Series(np.dot(rendements,Poids).reshape(-1,))   # calul de la rentabilité du portefeuille
+    résultat=-ratio(val_portefeuille_rendements,rendement_taux_sans_risque)   # résultat de la maximisation grace au - car on peut que minimiser avec pandas
+    if np.isnan(résultat) or np.isinf(résultat): # pour enlevé les problemes de calculs si denominateur de raproche de 0 ou inf
+        return 10
+    return résultat
+
+
 
