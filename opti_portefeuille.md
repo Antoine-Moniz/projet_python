@@ -90,5 +90,8 @@ def optimisation_Poids(x, arguments):  # Fonction d'optimisation qui utilise l'a
     résultat = minimize(scipy_func, x, args=arguments, constraints=cons, method='SLSQP')  # Appelle la fonction 'minimize' de SciPy avec la méthode 'SLSQP', en passant la fonction d'objectif 'scipy_func', le vecteur de poids initial 'x', les arguments supplémentaires, les contraintes et spécifie la méthode d'optimisation.
     return résultat  # Retourne l'objet résultat de l'optimisation, qui contient les poids optimisés parmi d'autres informations.
 
+def optimisation_Poids_efficace(x, arguments):  # Fonction d'optimisation alternative utilisant l'algorithme 'differential_evolution'.
+    nombre_actifs = len(x[0])  # Détermine le nombre d'actifs en examinant la longueur de la première sous-liste de `x`, qui contient les poids initiaux.
+    bounds = [(-1, 1) for _ in range(nombre_actifs)]  # Établit des bornes pour chaque poids d'actif, permettant ici des valeurs négatives, ce qui peut indiquer une vente à découvert.
 
 
