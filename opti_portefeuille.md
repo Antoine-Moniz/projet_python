@@ -95,3 +95,17 @@ def optimisation_Poids_efficace(x, arguments):  # Fonction d'optimisation altern
     bounds = [(-1, 1) for _ in range(nombre_actifs)]  # Établit des bornes pour chaque poids d'actif, permettant ici des valeurs négatives, ce qui peut indiquer une vente à découvert.
 
 
+    def objective_function(Poids):  # Fonction d'objectif interne pour 'differential_evolution'.
+        return scipy_func_avec_pénalité(Poids, arguments)  # Appelle la fonction 'scipy_func_avec_pénalité' avec les poids actuels et les arguments passés.
+
+    résultat = differential_evolution(objective_function, bounds)  # Appelle la fonction 'differential_evolution' de SciPy avec la fonction d'objectif et les bornes. Cette méthode est plus robuste mais potentiellement plus lente que 'SLSQP'.
+    return résultat  # Retourne l'objet résultat de l'optimisation, contenant les poids optimisés.
+# Demander à l'utilisateur quel ratio utiliser pour l'optimisation du portefeuille, avec "Sharpe" comme valeur par défaut.
+choix_ratio = input("Voulez-vous optimiser votre portefeuille selon le ratio de Sharpe, Sortino, ou Calmar? Entrez 'Sharpe', 'Sortino' ou 'Calmar' (par défaut : Sharpe) : ") or "Sharpe"
+print(f"Vous avez choisi d'optimiser selon le ratio de {choix_ratio}.")
+
+# Demander à l'utilisateur de choisir entre une méthode d'optimisation longue et très efficace ou une courte mais moins efficace, avec "courte mais moins efficace" comme valeur par défaut.
+choix_optimisation = input("Voulez-vous utiliser une méthode d'optimisation 'longue et très efficace' ou 'courte mais moins efficace'? (par défaut : courte mais moins efficace) : ") or "courte mais moins efficace"
+
+print(f"Vous avez choisi d'utiliser une méthode d'optimisation {choix_optimisation }.")
+# Demander à l'utilisateur de saisir le taux sans risque, avec 0.3 comme valeur par défaut.
