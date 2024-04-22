@@ -68,17 +68,27 @@ def scipy_func(x,arguments):   # technique d'optimisation la plus rapide mais la
         return 10
     return résultat
 
-def scipy_func_avec_pénalité(x,arguments):  #algo plus complexe mais plus lent  # Définition de la fonction avec deux arguments: `x` (les poids des actifs) et `arguments` (un tuple contenant le ratio de performance, le taux de rendement sans risque et les rendements historiques des actifs).
-    Poids=x.reshape(-1,1)   # Reformate le vecteur des poids `x` en une matrice colonne pour faciliter les opérations matricielles.
-    ratio, rendement_taux_sans_risque, rendements = arguments    # Décompose le tuple `arguments` pour extraire le ratio de performance, le taux de rendement sans risque et les rendements historiques des actifs.
+def scipy_func_avec_pénalité(x,arguments):  #algo plus complexe mais plus lent  # Définition de la fonction avec deux arguments: x (les poids des actifs) et arguments (un tuple contenant le ratio de performance, le taux de rendement sans risque et les rendements historiques des actifs).
+    Poids=x.reshape(-1,1)   # Reformate le vecteur des poids x en une matrice colonne pour faciliter les opérations matricielles.
+    ratio, rendement_taux_sans_risque, rendements = arguments    # Décompose le tuple arguments pour extraire le ratio de performance, le taux de rendement sans risque et les rendements historiques des actifs.
     val_portefeuille_rendements=pd.Series(np.dot(rendements,Poids).reshape(-1,))   # Calcule les rendements du portefeuille en multipliant la matrice des rendements historiques par les poids, puis transforme le résultat en une série pandas.
     résultat=-ratio(val_portefeuille_rendements,rendement_taux_sans_risque)# Applique la fonction de ratio de performance (par exemple, Sharpe, Sortino, Calmar) aux rendements du portefeuille, et multiplie le résultat par -1 car l'optimiseur cherche à minimiser cette fonction.
-    
-    
     pénalité=100* np.abs((np.sum(np.abs(x))-1)) # Calcule une pénalité proportionnelle à l'écart entre la somme des poids absolus des actifs et 1. Cette pénalité est ajoutée pour forcer les poids à s'additionner à 1.
-    
     if np.isnan(résultat) or np.isinf(résultat): # Vérifie si le résultat est NaN (non défini) ou infini, ce qui peut arriver si les calculs ne sont pas valides (par exemple, division par zéro).
         return 1000 + pénalité  # Si le résultat est NaN ou infini, retourne une valeur très élevée (1000 dans ce cas) plus la pénalité, ce qui décourage l'optimiseur de choisir cette solution.
     return résultat + pénalité  # Retourne le résultat de la fonction de ratio de performance ajusté par la pénalité. Cela permet à l'optimiseur de prendre en compte à la fois la performance du portefeuille et le respect de la contrainte des poids.
+
+
+
+def contrainte(x):  # Définit une fonction de contrainte pour l'optimisation.
+    return np.sum(x) - 1  # La somme des poids des actifs doit être égale à 1. Cette ligne calcule cette somme et soustrait 1, visant à obtenir zéro 
+
+def optimisation_Poids(x, arguments):  # Fonction d'optimisation qui utilise l'algorithme 'SLSQP' pour trouver les poids optimaux des actifs.
+    cons = {'type': 'eq', 'fun': contrainte}  # Crée un dictionnaire représentant une contrainte d'égalité ('eq') qui utilise la fonction 'contrainte' définie précédemment.
+    nombre_actifs = x.size  # Détermine le nombre d'actifs en examinant la taille du vecteur des poids initiaux `x`.
+    bounds = [(0, 1) for _ in range(nombre_actifs)]  # Établit les bornes pour chaque poids d'actif, les limitant à l'intervalle [0, 1] pour chaque actif.
+    résultat = minimize(scipy_func, x, args=arguments, constraints=cons, method='SLSQP')  # Appelle la fonction 'minimize' de SciPy avec la méthode 'SLSQP', en passant la fonction d'objectif 'scipy_func', le vecteur de poids initial 'x', les arguments supplémentaires, les contraintes et spécifie la méthode d'optimisation.
+    return résultat  # Retourne l'objet résultat de l'optimisation, qui contient les poids optimisés parmi d'autres informations.
+
 
 
