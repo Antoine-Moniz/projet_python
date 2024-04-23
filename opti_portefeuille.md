@@ -109,3 +109,16 @@ choix_optimisation = input("Voulez-vous utiliser une méthode d'optimisation 'lo
 
 print(f"Vous avez choisi d'utiliser une méthode d'optimisation {choix_optimisation }.")
 # Demander à l'utilisateur de saisir le taux sans risque, avec 0.3 comme valeur par défaut.
+try:
+    rendement_taux_sans_risque = float(input("Entrez le rendement du taux sans risque (en %, par défaut 0.3) : ") or 0.3)
+except ValueError:
+    print("Entrée invalide. Utilisation de la valeur par défaut : 0.3%")
+    rendement_taux_sans_risque = 0.3
+
+# Demander à l'utilisateur de saisir la taille de la fenêtre, avec 1000 comme valeur par défaut.
+try:
+    fenêtre = int(input("Entrez la taille de la fenêtre (par défaut 1000) : ") or 1000)
+except ValueError:
+    print("Entrée invalide. Utilisation de la valeur par défaut : 1000")
+    fenêtre = 1000
+
