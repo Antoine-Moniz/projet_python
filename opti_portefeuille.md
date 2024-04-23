@@ -158,3 +158,15 @@ else:  # longue et très efficace
             poids_optimisés = optimisation_Poids_efficace(x0, [calmar, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
             opti_Poids.append(list(poids_optimisés))
 
+opti_Poids=pd.DataFrame(np.array(opti_Poids), columns=rendements.columns, index =rendements.iloc[-len(np.array(opti_Poids)):].index)
+# Convertir le tableau numpy des poids optimisés en un DataFrame pandas pour une manipulation plus aisée. 
+# Définir les noms de colonnes pour correspondre à ceux des rendements des actifs et indexer le DataFrame avec les dates correspondantes des rendements.
+
+backtest=(rendements.iloc[-len(np.array(opti_Poids)):]*opti_Poids).sum(axis=1)
+# Calculer les rendements du backtest en multipliant les rendements des actifs par les poids optimisés correspondants pour chaque période, 
+# puis en sommant ces produits pour obtenir le rendement total du portefeuille à chaque période. 
+# Les données de rendement utilisées correspondent à la période couverte par les poids optimisés.
+
+backtest[np.abs(backtest)>0.5]=0
+# Remplacer par 0 les valeurs du backtest dont l'absolu est supérieur à 1. 
+# Cela pourrait être utilisé pour éliminer les valeurs aberrantes ou les erreurs de calcul qui entraînent des rendements irréalistes.
