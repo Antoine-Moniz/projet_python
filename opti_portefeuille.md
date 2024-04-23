@@ -144,3 +144,17 @@ if choix_optimisation == "courte mais moins efficace":
             poids_optimisés = optimisation_Poids(x0, [calmar, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
             opti_Poids.append(list(poids_optimisés))
 
+else:  # longue et très efficace
+    if choix_ratio == "Sharpe":
+        for i in range(fenêtre, len(rendements)):
+            poids_optimisés = optimisation_Poids_efficace(x0, [sharpe, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
+            opti_Poids.append(list(poids_optimisés))
+    elif choix_ratio == "Sortino":
+        for i in range(fenêtre, len(rendements)):
+            poids_optimisés = optimisation_Poids_efficace(x0, [sortino, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
+            opti_Poids.append(list(poids_optimisés))
+    elif choix_ratio == "Calmar":
+        for i in range(fenêtre, len(rendements)):
+            poids_optimisés = optimisation_Poids_efficace(x0, [calmar, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
+            opti_Poids.append(list(poids_optimisés))
+
