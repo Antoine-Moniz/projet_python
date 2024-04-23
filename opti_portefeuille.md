@@ -121,4 +121,26 @@ try:
 except ValueError:
     print("Entrée invalide. Utilisation de la valeur par défaut : 1000")
     fenêtre = 1000
+Poids = [np.ones(shape=(len(rendements.columns),)) / len(rendements.columns)]  # Initialisation des poids de chaque actif dans le portefeuille de manière équitable.
+x0 = Poids[0]  # Le vecteur initial de poids pour l'optimisation.
+
+opti_Poids = []  # Initialisation de la liste pour stocker les poids optimisés à différents points dans le temps.
+
+if choix_optimisation == "courte mais moins efficace":
+    if choix_ratio == "Sharpe":
+        # Boucle pour effectuer une optimisation itérative sur une fenêtre glissante des données de rendements.
+        for i in range(fenêtre, len(rendements)):
+            # À chaque itération, la fonction 'optimisation_Poids' est appelée avec les paramètres actuels pour optimiser les poids.
+            # La fenêtre des données de rendements utilisée pour l'optimisation se déplace à chaque itération.
+            poids_optimisés = optimisation_Poids(x0, [sharpe, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
+            opti_Poids.append(list(poids_optimisés))  # Les poids optimisés sont ajoutés à la liste 'opti_Poids'.
+        # on a pris en compte le fait de ne pas utiliser les informations du futur.
+    elif choix_ratio == "Sortino":
+        for i in range(fenêtre, len(rendements)):
+            poids_optimisés = optimisation_Poids(x0, [sortino, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
+            opti_Poids.append(list(poids_optimisés))
+    elif choix_ratio == "Calmar":
+        for i in range(fenêtre, len(rendements)):
+            poids_optimisés = optimisation_Poids(x0, [calmar, rendement_taux_sans_risque, rendements.iloc[i-fenêtre:i]]).x
+            opti_Poids.append(list(poids_optimisés))
 
