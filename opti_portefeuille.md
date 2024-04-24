@@ -185,4 +185,33 @@ cac40 = yf.download(choix_benchmark, start= date_debut)['Adj Close']
 cac40_rendements=cac40.pct_change().dropna()
 # Calculer les rendements quotidiens en pourcentage de l'indice S&P 500 et supprimer la première valeur qui est NaN à cause du calcul du pourcentage de changement.
 
+achat_conservation=rendements.mean(axis=1)    
+# Calculer la stratégie d'achat et de conservation (buy and hold) en prenant la moyenne des rendements de tous les actifs à chaque période.
+# Cela fournit un rendement moyen quotidien pour un portefeuille équipondéré composé de tous les actifs sélectionnés.
+# Trouvez la première date où les deux séries ont des données
+date_debut_commune = max(backtest.dropna().index[0], cac40.dropna().index[0])
+
+# Tronquez les séries pour qu'elles commencent à la date de début commune
+backtest_tronqué = backtest[backtest.index >= date_debut_commune]
+cac40_tronqué = cac40[cac40.index >= date_debut_commune]
+
+# Convertissez les rendements quotidiens en rendements cumulatifs à partir de la date de début commune
+cumulative_rendements_backtest_tronqué = (1 + backtest_tronqué).cumprod() - 1
+cumulative_rendements_cac40_tronqué = (1 + cac40_tronqué.pct_change().fillna(0)).cumprod() - 1
+
+# Tracer les rendements cumulatifs du backtest et du benchmark tronqués
+plt.figure(figsize=(14, 7))
+plt.plot(cumulative_rendements_backtest_tronqué, label='Backtest')
+plt.plot(cumulative_rendements_cac40_tronqué, label='CAC 40')
+
+# Ajouter des titres et des étiquettes
+plt.title('Comparaison des rendements cumulés: Backtest vs Benchmark')
+plt.xlabel('Date')
+plt.ylabel('Rendements cumulés')
+plt.legend()
+
+# Afficher le graphique
+plt.show()
+
+
 
