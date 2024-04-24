@@ -167,6 +167,22 @@ backtest=(rendements.iloc[-len(np.array(opti_Poids)):]*opti_Poids).sum(axis=1)
 # puis en sommant ces produits pour obtenir le rendement total du portefeuille à chaque période. 
 # Les données de rendement utilisées correspondent à la période couverte par les poids optimisés.
 
-backtest[np.abs(backtest)>0.5]=0
+backtest[np.abs(backtest)>1]=0
 # Remplacer par 0 les valeurs du backtest dont l'absolu est supérieur à 1. 
 # Cela pourrait être utilisé pour éliminer les valeurs aberrantes ou les erreurs de calcul qui entraînent des rendements irréalistes.
+
+
+# Demander à l'utilisateur de choisir un benchmark, avec "CAC 40" comme valeur par défaut.
+choix_benchmark = input("Choisissez un benchmark donner son ticker: par default le cac40").strip().lower() or "^FCHI"
+
+
+
+# Télécharger les données de prix ajustés de clôture pour le benchmark sélectionné à partir de l'année 2013.
+cac40 = yf.download(choix_benchmark, start= date_debut)['Adj Close']
+
+
+
+cac40_rendements=cac40.pct_change().dropna()
+# Calculer les rendements quotidiens en pourcentage de l'indice S&P 500 et supprimer la première valeur qui est NaN à cause du calcul du pourcentage de changement.
+
+
