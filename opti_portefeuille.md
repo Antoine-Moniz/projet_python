@@ -213,5 +213,33 @@ plt.legend()
 # Afficher le graphique
 plt.show()
 
- 
+ import matplotlib.pyplot as plt
+
+# Trouvez la première date où les deux séries ont des données
+date_debut_commune = max(backtest.dropna().index[0], achat_conservation.dropna().index[0])
+
+# Tronquez les séries pour qu'elles commencent à la date de début commune
+backtest_tronqué = backtest[backtest.index >= date_debut_commune]
+achat_conservation_tronqué = achat_conservation[achat_conservation.index >= date_debut_commune]
+
+# Calculez les rendements cumulés pour chaque série
+cumulative_rendements_backtest = (1 + backtest_tronqué).cumprod() - 1
+cumulative_rendements_achat_conservation = (1 + achat_conservation_tronqué).cumprod() - 1
+
+# Créez le graphique en utilisant matplotlib
+plt.figure(figsize=(14, 7))
+plt.plot(cumulative_rendements_backtest, label='Backtest')
+plt.plot(cumulative_rendements_achat_conservation, label='Achat et Conservation')
+
+# Ajoutez un titre et des étiquettes pour les axes
+plt.title('Comparaison des rendements cumulés: Backtest vs Achat et Conservation')
+plt.xlabel('Date')
+plt.ylabel('Rendements cumulés')
+
+# Ajoutez une légende
+plt.legend()
+
+# Affichez le graphique
+plt.show()
+
 
