@@ -213,5 +213,5 @@ plt.legend()
 # Afficher le graphique
 plt.show()
 
-
+ 
 
