@@ -1,4 +1,3 @@
-# projet_python
 
 #pip install pandas yfinance numpy matplotlib seaborn scipy pyfolio quantstats
 
@@ -7,15 +6,11 @@ import yfinance as yf  # Utilisé pour récupérer les données financières de 
 import numpy as np  # Bibliothèque pour le calcul scientifique et la manipulation de tableaux.
 import matplotlib.pyplot as plt  # Pour la création de graphiques statiques, animés et interactifs.
 import seaborn as sns  # Pour de belles visualisations de données, basées sur matplotlib.
-
 from scipy.optimize import minimize  
-
 # Pour les algorithmes d'optimisation minimale.
 from scipy.optimize import differential_evolution  # Pour les algorithmes d'optimisation par évolution différentielle.
 import pyfolio as pf  # Pour créer des feuilles de calcul de rendement et analyser les performances des stratégies de trading.
 import quantstats as qs  # Pour les analyses de performance et de risque des séries temporelles financières.
-
-
 
 # Présenter les tickers français par défaut
 print("Tickers français par défaut: 'AIR', 'OR', 'AI', 'BNP', 'MC', 'SU', 'SAN', 'KER'")
@@ -25,9 +20,9 @@ user_input = input("Appuyez sur Entrée pour utiliser les valeurs par défaut ou
 tickers = user_input.strip() if user_input.strip() != "" else "AIR, SU, SAN, EL, TTE, DG, BN"
 print("Tickers sélectionnés:", tickers)
 
+
 # Demandez à l'utilisateur de saisir une date de début, avec une date par défaut.
 date_debut = input("Entrez la date de début (format YYYY-MM-DD, par défaut 2014-01-01) Appuyez sur Entrée pour utiliser les valeurs par défaut : ") or "2014-01-01"
-
 
 prix = yf.download(tickers,start=date_debut)['Adj Close']  
 
@@ -51,7 +46,6 @@ def sharpe(rendements,rendement_taux_sans_risque):
     rendement_annuel = np.prod(rendements+1)**(252/len(rendements))-1
     return ( rendement_annuel - rendement_taux_sans_risque )/ écart_type  # Calculer du ratio de Sharpe.
 
-
 def calmar(rendements,rendement_taux_sans_risque):
     val_portefeuille=np.cumprod(rendements+1) #Calcule la valeur cumulée du portefeuille en supposant que tous les rendements sont réinvestis.
     peak=val_portefeuille.expanding(1).max()  #Détermine la valeur maximale du portefeuille jusqu'à chaque point dans le temps, ce qui aide à identifier les pics avant les drawdowns.
@@ -68,6 +62,7 @@ def scipy_func(x,arguments):   # technique d'optimisation la plus rapide mais la
         return 10
     return résultat
 
+
 def scipy_func_avec_pénalité(x,arguments):  #algo plus complexe mais plus lent  # Définition de la fonction avec deux arguments: x (les poids des actifs) et arguments (un tuple contenant le ratio de performance, le taux de rendement sans risque et les rendements historiques des actifs).
     Poids=x.reshape(-1,1)   # Reformate le vecteur des poids x en une matrice colonne pour faciliter les opérations matricielles.
     ratio, rendement_taux_sans_risque, rendements = arguments    # Décompose le tuple arguments pour extraire le ratio de performance, le taux de rendement sans risque et les rendements historiques des actifs.
@@ -79,25 +74,23 @@ def scipy_func_avec_pénalité(x,arguments):  #algo plus complexe mais plus lent
     return résultat + pénalité  # Retourne le résultat de la fonction de ratio de performance ajusté par la pénalité. Cela permet à l'optimiseur de prendre en compte à la fois la performance du portefeuille et le respect de la contrainte des poids.
 
 
-
 def contrainte(x):  # Définit une fonction de contrainte pour l'optimisation.
     return np.sum(x) - 1  # La somme des poids des actifs doit être égale à 1. Cette ligne calcule cette somme et soustrait 1, visant à obtenir zéro 
 
+
 def optimisation_Poids(x, arguments):  # Fonction d'optimisation qui utilise l'algorithme 'SLSQP' pour trouver les poids optimaux des actifs.
     cons = {'type': 'eq', 'fun': contrainte}  # Crée un dictionnaire représentant une contrainte d'égalité ('eq') qui utilise la fonction 'contrainte' définie précédemment.
-    nombre_actifs = x.size  # Détermine le nombre d'actifs en examinant la taille du vecteur des poids initiaux `x`.
+    nombre_actifs = x.size  # Détermine le nombre d'actifs en examinant la taille du vecteur des poids initiaux x.
     bounds = [(0, 1) for _ in range(nombre_actifs)]  # Établit les bornes pour chaque poids d'actif, les limitant à l'intervalle [0, 1] pour chaque actif.
     résultat = minimize(scipy_func, x, args=arguments, constraints=cons, method='SLSQP')  # Appelle la fonction 'minimize' de SciPy avec la méthode 'SLSQP', en passant la fonction d'objectif 'scipy_func', le vecteur de poids initial 'x', les arguments supplémentaires, les contraintes et spécifie la méthode d'optimisation.
     return résultat  # Retourne l'objet résultat de l'optimisation, qui contient les poids optimisés parmi d'autres informations.
 
+
 def optimisation_Poids_efficace(x, arguments):  # Fonction d'optimisation alternative utilisant l'algorithme 'differential_evolution'.
-    nombre_actifs = len(x[0])  # Détermine le nombre d'actifs en examinant la longueur de la première sous-liste de `x`, qui contient les poids initiaux.
+    nombre_actifs = len(x[0])  # Détermine le nombre d'actifs en examinant la longueur de la première sous-liste de x, qui contient les poids initiaux.
     bounds = [(-1, 1) for _ in range(nombre_actifs)]  # Établit des bornes pour chaque poids d'actif, permettant ici des valeurs négatives, ce qui peut indiquer une vente à découvert.
-
-
     def objective_function(Poids):  # Fonction d'objectif interne pour 'differential_evolution'.
         return scipy_func_avec_pénalité(Poids, arguments)  # Appelle la fonction 'scipy_func_avec_pénalité' avec les poids actuels et les arguments passés.
-
     résultat = differential_evolution(objective_function, bounds)  # Appelle la fonction 'differential_evolution' de SciPy avec la fonction d'objectif et les bornes. Cette méthode est plus robuste mais potentiellement plus lente que 'SLSQP'.
     return résultat  # Retourne l'objet résultat de l'optimisation, contenant les poids optimisés.
 # Demander à l'utilisateur quel ratio utiliser pour l'optimisation du portefeuille, avec "Sharpe" comme valeur par défaut.
@@ -121,10 +114,12 @@ try:
 except ValueError:
     print("Entrée invalide. Utilisation de la valeur par défaut : 1000")
     fenêtre = 1000
+
 Poids = [np.ones(shape=(len(rendements.columns),)) / len(rendements.columns)]  # Initialisation des poids de chaque actif dans le portefeuille de manière équitable.
 x0 = Poids[0]  # Le vecteur initial de poids pour l'optimisation.
 
 opti_Poids = []  # Initialisation de la liste pour stocker les poids optimisés à différents points dans le temps.
+
 
 if choix_optimisation == "courte mais moins efficace":
     if choix_ratio == "Sharpe":
@@ -171,14 +166,15 @@ backtest[np.abs(backtest)>1]=0
 # Remplacer par 0 les valeurs du backtest dont l'absolu est supérieur à 1. 
 # Cela pourrait être utilisé pour éliminer les valeurs aberrantes ou les erreurs de calcul qui entraînent des rendements irréalistes.
 
-
 # Demander à l'utilisateur de choisir un benchmark, avec "CAC 40" comme valeur par défaut.
 choix_benchmark = input("Choisissez un benchmark donner son ticker: par default le cac40").strip().lower() or "^FCHI"
 
 
 
+
 # Télécharger les données de prix ajustés de clôture pour le benchmark sélectionné à partir de l'année 2013.
 cac40 = yf.download(choix_benchmark, start= date_debut)['Adj Close']
+
 
 
 
@@ -212,8 +208,7 @@ plt.legend()
 
 # Afficher le graphique
 plt.show()
-
- import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Trouvez la première date où les deux séries ont des données
 date_debut_commune = max(backtest.dropna().index[0], achat_conservation.dropna().index[0])
@@ -241,5 +236,31 @@ plt.legend()
 
 # Affichez le graphique
 plt.show()
- 
+import matplotlib.pyplot as plt
 
+# Trouvez la première date où les deux séries ont des données
+date_debut_commune = max(achat_conservation.dropna().index[0], cac40.dropna().index[0])
+
+# Tronquez les séries pour qu'elles commencent à la date de début commune
+achat_conservation_tronqué = achat_conservation[achat_conservation.index >= date_debut_commune]
+cac40_tronqué = cac40[cac40.index >= date_debut_commune]
+
+# Calculez les rendements cumulés pour chaque série
+cumulative_rendements_achat_conservation = (1 + achat_conservation_tronqué).cumprod() - 1
+cumulative_rendements_cac40 = (1 + cac40_tronqué.pct_change().fillna(0)).cumprod() - 1
+
+# Créez le graphique en utilisant matplotlib
+plt.figure(figsize=(14, 7))
+plt.plot(cumulative_rendements_achat_conservation, label='Achat et Conservation')
+plt.plot(cumulative_rendements_cac40, label='CAC 40')
+
+# Ajoutez un titre et des étiquettes pour les axes
+plt.title('Comparaison des rendements cumulés: Achat et Conservation vs CAC 40')
+plt.xlabel('Date')
+plt.ylabel('Rendements cumulés')
+
+# Ajoutez une légende
+plt.legend()
+
+# Affichez le graphique
+plt.show()
