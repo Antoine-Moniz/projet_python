@@ -10,7 +10,7 @@ from scipy.optimize import minimize
 # Pour les algorithmes d'optimisation minimale.
 from scipy.optimize import differential_evolution  # Pour les algorithmes d'optimisation par évolution différentielle.
 import pyfolio as pf  # Pour créer des feuilles de calcul de rendement et analyser les performances des stratégies de trading.
-*import quantstats as qs  # Pour les analyses de performance et de risque des séries temporelles financières.
+* import quantstats as qs  # Pour les analyses de performance et de risque des séries temporelles financières.
 
 ## Présenter les tickers français par défaut
 print("Tickers français par défaut: 'AIR', 'OR', 'AI', 'BNP', 'MC', 'SU', 'SAN', 'KER'")
